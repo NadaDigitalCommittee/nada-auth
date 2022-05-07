@@ -35,27 +35,27 @@ app.post(
         return res.send({
           type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
           data: {
-            content:
-              "あなたにはこのコマンドの実行権限がありません",
+            content: "あなたにはこのコマンドの実行権限がありません",
             flags: 1 << 6,
           },
         });
       }
-      await axios.post(process.env.RULE_WEBHOOK as string,{
-            content:"サーバーでの禁止行為\n・過度な連投行為（10秒の間に5回以上送信する）をしたとき、10分間メッセージを送れません。（一時ミュート）\n・三回の警告を受けるとメッセージを送れません。（ミュート）\n\n・ミュートは管理者による注意のあと解除されます。\n\nこのサーバーは以下の人が利用します。\n・デジタル委員\n・Adobeライセンス利用希望者\n・Adobeライセンス利用者\n・デジタル委員会を利用する生徒会員\n・放送委員\n・顧問及びその他教職員\n\nこのサーバーの使い方\n1、灘生であることを確認するため下のボタンからフォームに回答して下さい(確認が取れ次第、管理者がロール付与します。)\n2、ロール選択 の説明を読んで必要なものを選択してください。\n3、その他のロールが必要なときは role-request に、書いてある説明通りに送ってください",
+      await axios.post(process.env.RULE_WEBHOOK as string, {
+        content:
+          "サーバーでの禁止行為\n・過度な連投行為（10秒の間に5回以上送信する）をしたとき、10分間メッセージを送れません。（一時ミュート）\n・三回の警告を受けるとメッセージを送れません。（ミュート）\n\n・ミュートは管理者による注意のあと解除されます。\n\nこのサーバーは以下の人が利用します。\n・デジタル委員\n・Adobeライセンス利用希望者\n・Adobeライセンス利用者\n・デジタル委員会を利用する生徒会員\n・放送委員\n・顧問及びその他教職員\n\nこのサーバーの使い方\n1、灘生であることを確認するため下のボタンからフォームに回答して下さい(確認が取れ次第、管理者がロール付与します。)\n2、ロール選択 の説明を読んで必要なものを選択してください。\n3、その他のロールが必要なときは role-request に、書いてある説明通りに送ってください",
+        components: [
+          {
+            type: 1,
             components: [
-              {
-                type: 1,
-                components: [
-                  new ButtonBuilder()
-                    .setCustomId("answer")
-                    .setLabel("回答する")
-                    .setStyle(ButtonStyle.Primary)
-                    .toJSON(),
-                ],
-              },
+              new ButtonBuilder()
+                .setCustomId("answer")
+                .setLabel("回答する")
+                .setStyle(ButtonStyle.Primary)
+                .toJSON(),
             ],
-          })
+          },
+        ],
+      });
       return res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
@@ -133,7 +133,11 @@ app.post(
                 { name: "組", value: `${values[1]}組`, inline: true },
                 { name: "番号", value: `${values[2]}番`, inline: true },
                 { name: "名前", value: `${values[3]}`, inline: true },
-                { name: "メンション", value: `<@${interaction.member.user.id}>`, inline: true },
+                {
+                  name: "メンション",
+                  value: `<@${interaction.member.user.id}>`,
+                  inline: true,
+                }
               )
               .setAuthor({
                 name: `${interaction.member.user.username}#${interaction.member.user.discriminator}(${interaction.member.user.id})`,
