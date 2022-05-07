@@ -7,16 +7,6 @@ import {
 const app = express();
 import { config } from "dotenv";
 config();
-import {
-  ActionRowBuilder,
-  ButtonBuilder,
-  EmbedBuilder,
-  ModalBuilder,
-  TextInputBuilder,
-} from "@discordjs/builders";
-import { REST } from "@discordjs/rest";
-import { Routes, ButtonStyle, TextInputStyle } from "discord-api-types/v10";
-const rest = new REST({ version: "10" }).setToken(process.env.TOKEN as string);
 import axios from "axios";
 
 interface ModalData {
@@ -47,11 +37,7 @@ app.post(
           {
             type: 1,
             components: [
-              new ButtonBuilder()
-                .setCustomId("answer")
-                .setLabel("回答する")
-                .setStyle(ButtonStyle.Primary)
-                .toJSON(),
+              { custom_id: "answer", label: "回答する", style: 1, type: 2 },
             ],
           },
         ],
@@ -76,48 +62,48 @@ app.post(
       }
       return res.send({
         type: InteractionResponseType.APPLICATION_MODAL,
-        data: new ModalBuilder()
-          .setCustomId("modal")
-          .setTitle("回答してください")
-          .setComponents(
-            new ActionRowBuilder<TextInputBuilder>().addComponents(
-              new TextInputBuilder()
-                .setLabel("回生")
-                .setCustomId("grade")
-                .setMaxLength(2)
-                .setMinLength(2)
-                .setRequired(true)
-                .setStyle(TextInputStyle.Short)
-            ),
-            new ActionRowBuilder<TextInputBuilder>().addComponents(
-              new TextInputBuilder()
-                .setLabel("組")
-                .setCustomId("class")
-                .setMaxLength(1)
-                .setMinLength(1)
-                .setRequired(true)
-                .setStyle(TextInputStyle.Short)
-            ),
-            new ActionRowBuilder<TextInputBuilder>().addComponents(
-              new TextInputBuilder()
-                .setLabel("番号")
-                .setCustomId("number")
-                .setMaxLength(2)
-                .setMinLength(1)
-                .setRequired(true)
-                .setStyle(TextInputStyle.Short)
-            ),
-            new ActionRowBuilder<TextInputBuilder>().addComponents(
-              new TextInputBuilder()
-                .setLabel("名前")
-                .setCustomId("name")
-                .setMaxLength(10)
-                .setMinLength(2)
-                .setRequired(true)
-                .setStyle(TextInputStyle.Short)
-            )
-          )
-          .toJSON(),
+        data: {
+          components: [
+            {
+              label: "回生",
+              custom_id: "g",
+              max_length: 2,
+              min_length: 2,
+              required: true,
+              style: 1,
+              type: 4
+            },
+            {
+              label: "組",
+              custom_id: "c",
+              max_length: 1,
+              min_length: 1,
+              required: true,
+              style: 1,
+              type: 4
+            },
+            {
+              label: "番号",
+              custom_id: "n",
+              max_length: 2,
+              min_length: 1,
+              required: true,
+              style: 1,
+              type: 4
+            },
+            {
+              label: "名前",
+              custom_id: "na",
+              max_length: 10,
+              min_length: 2,
+              required: true,
+              style: 1,
+              type: 4
+            },
+          ].map((x) => ({ type: 1, components: [x] })),
+          title: "回答して下さい",
+          custom_id: "modal",
+        },
       });
     } else if (interaction.type === InteractionType.APPLICATION_MODAL_SUBMIT) {
       const values = interaction.data.components.map(
@@ -127,8 +113,8 @@ app.post(
         .post(process.env.WEBHOOK as string, {
           username: "回答通知",
           embeds: [
-            new EmbedBuilder()
-              .addFields(
+            {
+              fields: [
                 { name: "学年", value: `${values[0]}回生`, inline: true },
                 { name: "組", value: `${values[1]}組`, inline: true },
                 { name: "番号", value: `${values[2]}番`, inline: true },
@@ -137,16 +123,17 @@ app.post(
                   name: "メンション",
                   value: `<@${interaction.member.user.id}>`,
                   inline: true,
-                }
-              )
-              .setAuthor({
+                },
+              ],
+              author: {
                 name: `${interaction.member.user.username}#${interaction.member.user.discriminator}(${interaction.member.user.id})`,
-                iconURL: interaction.member.user.avatar
+                icon_url: interaction.member.user.avatar
                   ? `https://cdn.discordapp.com/avatars/${interaction.member.user.id}/${interaction.member.user.avatar}.png`
                   : undefined,
-              })
-              .setColor(3447003),
-          ].map((x) => x.toJSON()),
+              },
+              color: 3447003,
+            },
+          ],
         })
         .then(() => {
           return res.send({
