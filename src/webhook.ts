@@ -1,11 +1,15 @@
 import { config } from "dotenv";
-config();
-
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/v10";
-const rest = new REST({ version: "10" }).setToken(process.env.TOKEN as string);
+
+config();
+const { TOKEN, RULE_CHANNEL_ID, ANSWER_CHANNEL_ID } = process.env as Record<
+  string,
+  string
+>;
+const rest = new REST({ version: "10" }).setToken(TOKEN);
 rest
-  .post(Routes.channelWebhooks(process.env.RULE_CHANNEL_ID as string), {
+  .post(Routes.channelWebhooks(RULE_CHANNEL_ID), {
     body: { name: "ルール" },
   })
   .then((x) => {
@@ -14,7 +18,7 @@ rest
   });
 
 rest
-  .post(Routes.channelWebhooks(process.env.ANSWER_CHANNEL_ID as string), {
+  .post(Routes.channelWebhooks(ANSWER_CHANNEL_ID), {
     body: { name: "回答" },
   })
   .then((x) => {

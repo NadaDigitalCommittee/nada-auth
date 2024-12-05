@@ -2,17 +2,19 @@ import { SlashCommandBuilder } from "@discordjs/builders";
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/v10";
 import { config } from "dotenv";
+import { ServerRulePostCommand } from "./constants";
 config();
 
+const { CLIENT_ID, TOKEN } = process.env as Record<string, string>;
 const commands = [
-  new SlashCommandBuilder().setName("post").setDescription("..."),
+  new SlashCommandBuilder()
+    .setName(ServerRulePostCommand.COMMAND_NAME)
+    .setDescription(ServerRulePostCommand.DESCRIPTION),
 ].map((x) => x.toJSON());
 
-const rest = new REST({ version: "10" }).setToken(process.env.TOKEN as string);
+const rest = new REST({ version: "10" }).setToken(TOKEN);
 
 rest
-  .put(Routes.applicationCommands(process.env.CLIENT_ID as string), {
-    body: commands,
-  })
-  .then(() => console.log("成功しました"))
+  .put(Routes.applicationCommands(CLIENT_ID), { body: commands })
+  .then(() => console.log(ServerRulePostCommand.POSTED))
   .catch(console.error);
