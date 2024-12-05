@@ -16,5 +16,5 @@ const rest = new REST({ version: "10" }).setToken(TOKEN);
 
 rest
   .put(Routes.applicationCommands(CLIENT_ID), { body: commands })
-  .then(() => console.log(ServerRulePostCommand.POSTED))
+  .then(() => console.log(ServerRulePostCommand.SUCCESSFULLY_SET_COMMAND))
   .catch(console.error);

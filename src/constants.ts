@@ -22,6 +22,7 @@ export class ValidationError {
 export class ServerRulePostCommand {
   static readonly COMMAND_NAME = "post";
   static readonly DESCRIPTION = "サーバールールをチャンネルに送信します。";
+  static readonly SUCCESSFULLY_SET_COMMAND = `サーバールール送信コマンド ${this.COMMAND_NAME} を設定しました。`;
   static readonly POSTED = "サーバールールを送信しました。";
   static readonly NO_PERMISSION = "あなたにはこのコマンドの実行権限がありません。";
   static readonly components = [
