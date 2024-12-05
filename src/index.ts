@@ -21,10 +21,8 @@ import {
 } from "./constants";
 
 config();
-const { TOKEN, KEY, MOD_ROLE, RULE_WEBHOOK, VERIFY_ROLE, WEBHOOK } = process.env as Record<
-  string,
-  string
->;
+const { TOKEN, KEY, ADMIN_ROLE, RULE_WEBHOOK, VERIFIED_ROLE, MODAL_SUBMISSION_WEBHOOK } =
+  process.env as Record<string, string>;
 
 const { approveOrReject } = VerificationProcess;
 const assert = <T>(v: unknown) => v as T;
@@ -59,7 +57,7 @@ app.post("/interactions", verifyKeyMiddleware(KEY), async (req, res) => {
     );
   switch (interaction.type) {
     case InteractionType.ApplicationCommand:
-      if (!member.roles.includes(MOD_ROLE))
+      if (!member.roles.includes(ADMIN_ROLE))
         return ephemeralReply(ServerRulePostCommand.NO_PERMISSION);
       await axios.post(RULE_WEBHOOK, {
         content: ServerRulePostCommand.SERVER_RULE,
@@ -83,11 +81,11 @@ app.post("/interactions", verifyKeyMiddleware(KEY), async (req, res) => {
           .get(Routes.guildMember(guildId, userId))
           .then(assert<APIGuildMember>)
           .then(({ roles }) => {
-            if (roles.includes(VERIFY_ROLE))
+            if (roles.includes(VERIFIED_ROLE))
               return ephemeralReply(VerificationProcess.USER_IS_ALREADY_VERIFIED);
             if (approved) {
               return rest
-                .put(Routes.guildMemberRole(guildId, userId, VERIFY_ROLE))
+                .put(Routes.guildMemberRole(guildId, userId, VERIFIED_ROLE))
                 .then(() => completeVerificationWith(VerificationProcess.ROLE_ASSIGNED))
                 .catch(() => ephemeralReply(VerificationProcess.ERROR_WHILE_ASSIGNING_ROLE));
             } else {
@@ -96,7 +94,7 @@ app.post("/interactions", verifyKeyMiddleware(KEY), async (req, res) => {
           })
           .catch(() => ephemeralReply(VerificationProcess.ERROR_WHILE_RETRIEVING_ROLE));
       }
-      if (member.roles.includes(VERIFY_ROLE)) {
+      if (member.roles.includes(VERIFIED_ROLE)) {
         return ephemeralReply(VerificationProcess.YOU_ARE_ALREADY_VERIFIED);
       } else {
         return res.send(VerificationProcess.modal);
@@ -109,7 +107,7 @@ app.post("/interactions", verifyKeyMiddleware(KEY), async (req, res) => {
             formatString(ValidationError.ERROR_DUE_TO_MISSING, "interaction.data.components")
         );
       return axios
-        .post(WEBHOOK, {
+        .post(MODAL_SUBMISSION_WEBHOOK, {
           username: "回答通知",
           embeds: VerificationProcess.modalSubmissionInfo(values, member.user),
           components: VerificationProcess.approvalButtons,
