@@ -29,6 +29,7 @@ const assert = <T>(v: unknown) => v as T;
 
 const rest = new REST({ version: "10" }).setToken(TOKEN);
 const app = express();
+export default app;
 app.post("/interactions", verifyKeyMiddleware(KEY), async (req, res) => {
   const ephemeralReply = (content: string) =>
     res.send({
